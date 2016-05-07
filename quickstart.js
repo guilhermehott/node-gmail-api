@@ -2,6 +2,7 @@ var fs = require('fs');
 var readline = require('readline');
 var google = require('googleapis');
 var googleAuth = require('google-auth-library');
+var base64 = require('js-base64').Base64;
 
 // If modifying these scopes, delete your previously saved credentials
 // at ~/.credentials/gmail-nodejs-quickstart.json
@@ -152,9 +153,35 @@ function listMessages(auth) {
             var message = result[i];
             console.log(message);
           }
+          getMessage(auth, result[0].id);
         }
       // }
     });
   };
   getPageOfMessages(params, []);
+}
+
+/**
+ * Get Message with given ID.
+ *
+ * @param  {String} userId User's email address. The special value 'me'
+ * can be used to indicate the authenticated user.
+ * @param  {String} messageId ID of Message to get.
+ * @param  {Function} callback Function to call when the request is complete.
+ */
+function getMessage(auth, messageId) {
+  var request = gapi.client.gmail.users.messages.get({
+    'auth': auth,
+    'userId': 'me',
+    'id': messageId
+  }, function(err, message){
+    var bodyData = message.payload.body.data;
+    // Simplified code: you'd need to check for multipart.
+
+    var msg = base64.decode(bodyData.replace(/-/g, '+').replace(/_/g, '/'));
+    // If you're going to use a different library other than js-base64,
+    // you may need to replace some characters before passing it to the decoder.
+
+    console.log(msg);
+  });
 }
