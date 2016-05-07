@@ -18,7 +18,7 @@ fs.readFile('client_secret.json', function processClientSecrets(err, content) {
   }
   // Authorize a client with the loaded credentials, then call the
   // Gmail API.
-  authorize(JSON.parse(content), listLabels);
+  authorize(JSON.parse(content), listMessages);
 });
 
 /**
@@ -121,4 +121,40 @@ function listLabels(auth) {
       }
     }
   });
+}
+
+/**
+ * Lists the labels in the user's account.
+ *
+ * @param {google.auth.OAuth2} auth An authorized OAuth2 client.
+ */
+function listMessages(auth) {
+  var params = {
+    auth: auth,
+    userId: 'me',
+    q: 'from:(atendimento@rico.com.vc)'
+  };
+
+  var getPageOfMessages = function(params, result, nextPageToken) {
+    if(nextPageToken) params.pageToken = nextPageToken;
+    google.gmail('v1').users.messages.list(params, function(err, resp) {
+      console.log(resp);
+      result = result.concat(resp.messages);
+      // var nextPageToken = resp.nextPageToken;
+      // if (nextPageToken) {
+      //   getPageOfMessages(params, result, nextPageToken);
+      // } else {
+        if (result.length == 0) {
+          console.log('No messages found.');
+        } else {
+          console.log('Messages:');
+          for (var i = 0; i < result.length; i++) {
+            var message = result[i];
+            console.log(message);
+          }
+        }
+      // }
+    });
+  };
+  getPageOfMessages(params, []);
 }
