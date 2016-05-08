@@ -139,7 +139,10 @@ function listMessages(auth) {
   var getPageOfMessages = function(params, result, nextPageToken) {
     if(nextPageToken) params.pageToken = nextPageToken;
     google.gmail('v1').users.messages.list(params, function(err, resp) {
-      console.log(resp);
+      if (err) {
+        console.log('The API returned an error: ' + err);
+        return;
+      }
       result = result.concat(resp.messages);
       // var nextPageToken = resp.nextPageToken;
       // if (nextPageToken) {
