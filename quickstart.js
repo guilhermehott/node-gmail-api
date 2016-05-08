@@ -173,7 +173,7 @@ function listMessages(auth) {
  * @param  {Function} callback Function to call when the request is complete.
  */
 function getMessage(auth, messageId) {
-  var request = gapi.client.gmail.users.messages.get({
+  google.gmail('v1').users.messages.get({
     'auth': auth,
     'userId': 'me',
     'id': messageId
